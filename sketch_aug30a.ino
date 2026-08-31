@@ -1,3 +1,4 @@
+//hleooooaoaooaoao
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -12,7 +13,6 @@ const char* PASSWORD = "hiephanh";
 #define DHTPIN 2
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
-
 // ================= OLED =================
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
