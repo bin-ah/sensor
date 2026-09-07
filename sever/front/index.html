@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Climate Monitor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="monitor-card" aria-label="ESP32 climate monitor">
+    <h1>ESP32 Climate Monitor</h1>
+
+    <section class="reading reading-temperature" aria-label="Temperature reading">
+      <span class="reading-icon thermometer-icon" aria-hidden="true">♨</span>
+      <span class="reading-label">Temperature</span>
+      <strong id="temp" class="reading-value">--.- °C</strong>
+    </section>
+
+    <section class="reading reading-humidity" aria-label="Humidity reading">
+      <span class="reading-icon drop-icon" aria-hidden="true">♥</span>
+      <span class="reading-label">Humidity</span>
+      <strong id="hum" class="reading-value">--.- %</strong>
+    </section>
+
+    <p id="time" class="updated">Auto refresh every 5 seconds</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

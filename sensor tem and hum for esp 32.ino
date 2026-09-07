@@ -3,17 +3,15 @@
 #include <Adafruit_SSD1306.h>
 #include <DHT.h>
 #include <WiFi.h>
+#include <HTTPClient.h>
 
-//WIFI
 const char* SSID = "Hong Huong";
 const char* PASSWORD = "0963893224";
 
-//DHT
 #define DHTPIN 4
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
-//OLED
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1
@@ -21,18 +19,20 @@ DHT dht(DHTPIN, DHTTYPE);
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-//WIFI INIT
 void initWifi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
   Serial.print("Connecting WiFi");
+
   unsigned long startAttemptTime = millis();
   while (WiFi.status() != WL_CONNECTED &&
          millis() - startAttemptTime < 15000) {
     delay(500);
     Serial.print(".");
   }
+
   Serial.println();
+
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("WiFi Connected!");
     Serial.print("IP: ");
@@ -41,8 +41,10 @@ void initWifi() {
     Serial.println("WiFi FAILED (no crash)");
   }
 }
+
 void setup() {
   Serial.begin(115200);
+
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println("OLED failed!");
     while (true);
@@ -54,19 +56,41 @@ void setup() {
   dht.begin();
   initWifi();
 }
+
 void loop() {
+
   float t = dht.readTemperature();
   float h = dht.readHumidity();
   bool dhtOK = !(isnan(t) || isnan(h));
+
+  if (dhtOK && WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+
+    http.begin("http://192.168.1.16:3000/data");
+    http.addHeader("Content-Type", "application/json");
+
+    String json = "{\"temp\":" + String(t) + ",\"hum\":" + String(h) + "}";
+
+    int code = http.POST(json);
+
+    Serial.print("Temp: ");
+    Serial.print(t);
+    Serial.print(" | Hum: ");
+    Serial.println(h);
+
+    Serial.print("HTTP Code: ");
+    Serial.println(code);
+
+    http.end();
+  }
+
   display.clearDisplay();
 
-  // TITLE
   display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(28, 0);
   display.print("DHT11");
 
-  // WIFI INFO
   display.setTextSize(1);
   display.setCursor(0, 20);
   display.print("WiFi: ");
@@ -81,7 +105,6 @@ void loop() {
   display.print(WiFi.RSSI());
   display.print(" dBm");
 
-  // TEMP + HUMIDITY
   display.setCursor(0, 52);
 
   if (dhtOK) {
@@ -93,6 +116,8 @@ void loop() {
   } else {
     display.print("DHT ERROR");
   }
+
   display.display();
+
   delay(2000);
 }
